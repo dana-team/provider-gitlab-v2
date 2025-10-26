@@ -11,7 +11,7 @@ spec:
     categories:
     - crossplane
     - managed
-    - gitlab-v2.m
+    - gitlab-v2
     kind: File
     listKind: FileList
     plural: files
