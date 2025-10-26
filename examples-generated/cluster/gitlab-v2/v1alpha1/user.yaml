@@ -1,0 +1,21 @@
+apiVersion: gitlab-v2.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: gitlab-v2/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    canCreateGroup: false
+    email: gitlab@user.create
+    isAdmin: true
+    isExternal: true
+    name: Example Foo
+    passwordSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    projectsLimit: 4
+    resetPassword: false

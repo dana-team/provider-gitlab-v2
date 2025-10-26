@@ -6,13 +6,14 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
-	nullCluster "github.com/crossplane/upjet-provider-template/config/cluster/null"
-	nullNamespaced "github.com/crossplane/upjet-provider-template/config/namespaced/null"
+	gitlabCluster "github.com/dana-team/provider-gitlab-v2/config/cluster/gitlab-v2"
+	gitlabNamespaced "github.com/dana-team/provider-gitlab-v2/config/namespaced/gitlab-v2"
 )
 
 const (
-	resourcePrefix = "template"
-	modulePath     = "github.com/crossplane/upjet-provider-template"
+	resourcePrefix           = "gitlab-v2"
+	namespacedResourcePrefix = "gitlab-v2.m"
+	modulePath               = "github.com/dana-team/provider-gitlab-v2"
 )
 
 //go:embed schema.json
@@ -24,7 +25,7 @@ var providerMetadata string
 // GetProvider returns provider configuration
 func GetProvider() *ujconfig.Provider {
 	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("template.crossplane.io"),
+		ujconfig.WithRootGroup("crossplane.io"),
 		ujconfig.WithIncludeList(ExternalNameConfigured()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
@@ -33,7 +34,7 @@ func GetProvider() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
-		nullCluster.Configure,
+		gitlabCluster.Configure,
 	} {
 		configure(pc)
 	}
@@ -44,8 +45,8 @@ func GetProvider() *ujconfig.Provider {
 
 // GetProviderNamespaced returns the namespaced provider configuration
 func GetProviderNamespaced() *ujconfig.Provider {
-	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("template.m.crossplane.io"),
+	pc := ujconfig.NewProvider([]byte(providerSchema), namespacedResourcePrefix, modulePath, []byte(providerMetadata),
+		ujconfig.WithRootGroup("m.crossplane.io"),
 		ujconfig.WithIncludeList(ExternalNameConfigured()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
@@ -57,7 +58,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
-		nullNamespaced.Configure,
+		gitlabNamespaced.Configure,
 	} {
 		configure(pc)
 	}

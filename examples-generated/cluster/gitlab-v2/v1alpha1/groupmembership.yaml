@@ -1,0 +1,14 @@
+apiVersion: gitlab-v2.crossplane.io/v1alpha1
+kind: GroupMembership
+metadata:
+  annotations:
+    meta.upbound.io/example-id: gitlab-v2/v1alpha1/groupmembership
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    accessLevel: guest
+    expiresAt: "2020-12-31"
+    groupId: 12345
+    userId: 1337

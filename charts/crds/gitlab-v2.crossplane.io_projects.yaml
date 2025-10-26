@@ -1,0 +1,2359 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: projects.gitlab-v2.crossplane.io
+spec:
+  group: gitlab-v2.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - gitlab-v2
+    kind: Project
+    listKind: ProjectList
+    plural: projects
+    singular: project
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'Project is the Schema for the Projects API. The gitlab_project
+          resource allows to manage the lifecycle of a project. A project can either
+          be created in a group or user namespace. -> Default Branch Protection Workaround
+          Projects are created with default branch protection. In the gitlab_project
+          resource, define a local-exec provisioner which invokes the /projects/:id/protected_branches/:name
+          API via curl to delete the branch protection on the default branch using
+          a DELETE request. Then define the desired branch protection using the gitlab_branch_protection
+          resource. Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/projects/'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ProjectSpec defines the desired state of Project
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: |-
+                  DeletionPolicy specifies what will happen to the underlying external
+                  when this managed resource is deleted - either "Delete" or "Orphan" the
+                  external resource.
+                  This field is planned to be deprecated in favor of the ManagementPolicies
+                  field in a future release. Currently, both could be set independently and
+                  non-default values would be honored if the feature flag is enabled.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                properties:
+                  allowMergeOnSkippedPipeline:
+                    description: |-
+                      (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
+                      Set to true if you want to treat skipped pipelines as if they finished with success.
+                    type: boolean
+                  allowPipelineTriggerApproveDeployment:
+                    description: |-
+                      (Boolean) Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                      Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                    type: boolean
+                  analyticsAccessLevel:
+                    description: |-
+                      (String) Set the analytics access level. Valid values are disabled, private, enabled.
+                      Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  approvalsBeforeMerge:
+                    description: |-
+                      (Number) Number of merge request approvals required for merging. Default is 0.
+                      This field does not work well in combination with the gitlab_project_approval_rule resource
+                      and is most likely gonna be deprecated in a future GitLab version (see this upstream epic).
+                      In the meantime we recommend against using this attribute and use gitlab_project_approval_rule instead.
+                      Number of merge request approvals required for merging. Default is 0.
+                      This field **does not** work well in combination with the `gitlab_project_approval_rule` resource
+                      and is most likely gonna be deprecated in a future GitLab version (see [this upstream epic](https://gitlab.com/groups/gitlab-org/-/epics/7572)).
+                      In the meantime we recommend against using this attribute and use `gitlab_project_approval_rule` instead.
+                    type: number
+                  archiveOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to archive the project instead of deleting on destroy. If set to true it will entire omit the DELETE operation.
+                      Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
+                    type: boolean
+                  archived:
+                    description: |-
+                      only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                      Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                    type: boolean
+                  autoCancelPendingPipelines:
+                    description: |-
+                      cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                      Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                    type: string
+                  autoDevopsDeployStrategy:
+                    description: |-
+                      (String) Auto Deploy strategy. Valid values are continuous, manual, timed_incremental.
+                      Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
+                    type: string
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Enable Auto DevOps for this project.
+                      Enable Auto DevOps for this project.
+                    type: boolean
+                  autocloseReferencedIssues:
+                    description: |-
+                      closing referenced issues on default branch.
+                      Set whether auto-closing referenced issues on default branch.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  buildCoverageRegex:
+                    description: |-
+                      (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                      Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                    type: string
+                  buildGitStrategy:
+                    description: |-
+                      (String) The Git strategy. Defaults to fetch. Valid values are clone, fetch.
+                      The Git strategy. Defaults to fetch. Valid values are `clone`, `fetch`.
+                    type: string
+                  buildTimeout:
+                    description: |-
+                      (Number) The maximum amount of time, in seconds, that a job can run.
+                      The maximum amount of time, in seconds, that a job can run.
+                    type: number
+                  buildsAccessLevel:
+                    description: |-
+                      (String) Set the builds access level. Valid values are disabled, private, enabled.
+                      Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  ciConfigPath:
+                    description: |-
+                      (String) Custom Path to CI config file.
+                      Custom Path to CI config file.
+                    type: string
+                  ciDefaultGitDepth:
+                    description: |-
+                      (Number) Default number of revisions for shallow cloning.
+                      Default number of revisions for shallow cloning.
+                    type: number
+                  ciDeletePipelinesInSeconds:
+                    description: |-
+                      (Number) Pipelines older than the configured time are deleted.
+                      Pipelines older than the configured time are deleted.
+                    type: number
+                  ciForwardDeploymentEnabled:
+                    description: |-
+                      (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+                      When a new deployment job starts, skip older deployment jobs that are still pending.
+                    type: boolean
+                  ciIdTokenSubClaimComponents:
+                    description: |-
+                      (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                      Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                    items:
+                      type: string
+                    type: array
+                  ciPipelineVariablesMinimumOverrideRole:
+                    description: |-
+                      (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are developer, maintainer, owner, no_one_allowed
+                      The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
+                    type: string
+                  ciRestrictPipelineCancellationRole:
+                    description: |-
+                      (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are developer, maintainer, no one
+                      The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+                    type: string
+                  ciSeparatedCaches:
+                    description: |-
+                      (Boolean) Use separate caches for protected branches.
+                      Use separate caches for protected branches.
+                    type: boolean
+                  containerExpirationPolicy:
+                    description: |-
+                      (Block List, Max: 1) Set the image cleanup policy for this project. Note: this field is sometimes named container_expiration_policy_attributes in the GitLab Upstream API. (see below for nested schema)
+                      Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API.
+                    items:
+                      properties:
+                        cadence:
+                          description: |-
+                            (String) The cadence of the policy. Valid values are: 1d, 7d, 14d, 1month, 3month.
+                            The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
+                          type: string
+                        enabled:
+                          description: |-
+                            (Boolean) If true, the policy is enabled.
+                            If true, the policy is enabled.
+                          type: boolean
+                        keepN:
+                          description: |-
+                            (Number) The number of images to keep.
+                            The number of images to keep.
+                          type: number
+                        nameRegex:
+                          description: |-
+                            (String, Deprecated) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexDelete:
+                          description: |-
+                            (String) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexKeep:
+                          description: |-
+                            (String) The regular expression to match image names to keep.
+                            The regular expression to match image names to keep.
+                          type: string
+                        olderThan:
+                          description: |-
+                            (String) The number of days to keep images.
+                            The number of days to keep images.
+                          type: string
+                      type: object
+                    type: array
+                  containerRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of container registry, for this project. Valid values are disabled, private, enabled.
+                      Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  containerRegistryEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable container registry for the project.
+                      Enable container registry for the project.
+                    type: boolean
+                  defaultBranch:
+                    description: |-
+                      (String) The default branch for the project.
+                      The default branch for the project.
+                    type: string
+                  description:
+                    description: |-
+                      (String) A description of the project.
+                      A description of the project.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  environmentsAccessLevel:
+                    description: |-
+                      (String) Set the environments access level. Valid values are disabled, private, enabled.
+                      Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  externalAuthorizationClassificationLabel:
+                    description: |-
+                      (String) The classification label for the project.
+                      The classification label for the project.
+                    type: string
+                  featureFlagsAccessLevel:
+                    description: |-
+                      (String) Set the feature flags access level. Valid values are disabled, private, enabled.
+                      Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  forkedFromProjectId:
+                    description: |-
+                      (Number) The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                      The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                    type: number
+                  forkingAccessLevel:
+                    description: |-
+                      (String) Set the forking access level. Valid values are disabled, private, enabled.
+                      Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  groupRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable group runners for this project.
+                      Enable group runners for this project.
+                    type: boolean
+                  groupWithProjectTemplatesId:
+                    description: |-
+                      level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                      For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                    type: number
+                  importUrl:
+                    description: |-
+                      (String) Git URL to a repository to be imported. Together with mirror = true it will setup a Pull Mirror. This can also be used together with forked_from_project_id to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in import_url_username and import_url_password. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                      Git URL to a repository to be imported. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                    type: string
+                  importUrlPasswordSecretRef:
+                    description: |-
+                      (String, Sensitive) The password for the import_url. The value of this field is used to construct a valid import_url and is only related to the provider. See the examples section for how to properly use it.
+                      The password for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. See the examples section for how to properly use it.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                      namespace:
+                        description: Namespace of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    - namespace
+                    type: object
+                  importUrlUsername:
+                    description: |-
+                      (String) The username for the import_url. The value of this field is used to construct a valid import_url and is only related to the provider.  See the examples section for how to properly use it.
+                      The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider.  See the examples section for how to properly use it.
+                    type: string
+                  infrastructureAccessLevel:
+                    description: |-
+                      (String) Set the infrastructure access level. Valid values are disabled, private, enabled.
+                      Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  initializeWithReadme:
+                    description: |-
+                      (Boolean) Create main branch with first commit containing a README.md file. Must be set to true if importing an uninitialized project with a different default_branch.
+                      Create main branch with first commit containing a README.md file. Must be set to `true` if importing an uninitialized project with a different `default_branch`.
+                    type: boolean
+                  issuesAccessLevel:
+                    description: |-
+                      (String) Set the issues access level. Valid values are disabled, private, enabled.
+                      Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  issuesEnabled:
+                    description: |-
+                      (Boolean) Enable issue tracking for the project.
+                      Enable issue tracking for the project.
+                    type: boolean
+                  issuesTemplate:
+                    description: |-
+                      (String) Sets the template for new issues in the project.
+                      Sets the template for new issues in the project.
+                    type: string
+                  keepLatestArtifact:
+                    description: |-
+                      (Boolean) Disable or enable the ability to keep the latest artifact for this project.
+                      Disable or enable the ability to keep the latest artifact for this project.
+                    type: boolean
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable LFS for the project.
+                      Enable LFS for the project.
+                    type: boolean
+                  mergeCommitTemplate:
+                    description: |-
+                      (String) Template used to create merge commit message in merge requests.
+                      Template used to create merge commit message in merge requests.
+                    type: string
+                  mergeMethod:
+                    description: |-
+                      (String) Set the merge method. Valid values are merge, rebase_merge, ff.
+                      Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
+                    type: string
+                  mergePipelinesEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge pipelines.
+                      Enable or disable merge pipelines.
+                    type: boolean
+                  mergeRequestsAccessLevel:
+                    description: |-
+                      (String) Set the merge requests access level. Valid values are disabled, private, enabled.
+                      Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mergeRequestsEnabled:
+                    description: |-
+                      (Boolean) Enable merge requests for the project.
+                      Enable merge requests for the project.
+                    type: boolean
+                  mergeRequestsTemplate:
+                    description: |-
+                      (String) Sets the template for new merge requests in the project.
+                      Sets the template for new merge requests in the project.
+                    type: string
+                  mergeTrainsEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge trains. Requires merge_pipelines_enabled to be set to true to take effect.
+                      Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
+                    type: boolean
+                  mirror:
+                    description: |-
+                      (Boolean) Enable project pull mirror.
+                      Enable project pull mirror.
+                    type: boolean
+                  mirrorOverwritesDivergedBranches:
+                    description: |-
+                      (Boolean) Enable overwrite diverged branches for a mirrored project.
+                      Enable overwrite diverged branches for a mirrored project.
+                    type: boolean
+                  mirrorTriggerBuilds:
+                    description: |-
+                      (Boolean) Enable trigger builds on pushes for a mirrored project.
+                      Enable trigger builds on pushes for a mirrored project.
+                    type: boolean
+                  modelExperimentsAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model experiments. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model experiments. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  modelRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model registry. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  monitorAccessLevel:
+                    description: |-
+                      (String) Set the monitor access level. Valid values are disabled, private, enabled.
+                      Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mrDefaultTargetSelf:
+                    description: |-
+                      (Boolean) For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                      For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the project.
+                      The name of the project.
+                    type: string
+                  namespaceId:
+                    description: |-
+                      (Number) The namespace (group or user) of the project. Defaults to your user.
+                      The namespace (group or user) of the project. Defaults to your user.
+                    type: number
+                  namespaceIdRef:
+                    description: Reference to a Group in gitlab-v2 to populate namespaceId.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  namespaceIdSelector:
+                    description: Selector for a Group in gitlab-v2 to populate namespaceId.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  onlyAllowMergeIfAllDiscussionsAreResolved:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if all discussions are resolved.
+                      Set to true if you want allow merges only if all discussions are resolved.
+                    type: boolean
+                  onlyAllowMergeIfPipelineSucceeds:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
+                      Set to true if you want allow merges only if a pipeline succeeds.
+                    type: boolean
+                  onlyMirrorProtectedBranches:
+                    description: |-
+                      (Boolean) Enable only mirror protected branches for a mirrored project.
+                      Enable only mirror protected branches for a mirrored project.
+                    type: boolean
+                  packagesEnabled:
+                    description: |-
+                      (Boolean) Enable packages repository for the project.
+                      Enable packages repository for the project.
+                    type: boolean
+                  pagesAccessLevel:
+                    description: |-
+                      (String) Enable pages access control. Valid values are public, private, enabled, disabled.
+                      Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
+                    type: string
+                  path:
+                    description: |-
+                      (String) The path of the repository.
+                      The path of the repository.
+                    type: string
+                  permanentlyDeleteOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                      Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                    type: boolean
+                  pipelinesEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable pipelines for the project. The pipelines_enabled field is being sent as jobs_enabled in the GitLab API calls.
+                      Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
+                    type: boolean
+                  preReceiveSecretDetectionEnabled:
+                    description: |-
+                      (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                      Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                    type: boolean
+                  preventMergeWithoutJiraIssue:
+                    description: |-
+                      (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                      Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                    type: boolean
+                  printingMergeRequestLinkEnabled:
+                    description: |-
+                      (Boolean) Show link to create/view merge request when pushing from the command line
+                      Show link to create/view merge request when pushing from the command line
+                    type: boolean
+                  publicBuilds:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  publicJobs:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the project. (see below for nested schema)
+                      Push rules for the project.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
+                            Users can only push commits to this repository that were committed with one of their own verified emails.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, e.g. ssh\:\/\/.
+                            No commit message is allowed to match this regex, e.g. `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) All committed filenames must not match this regex, e.g. (jar|exe)$.
+                            All committed filenames must not match this regex, e.g. `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB).
+                            Maximum file size (MB).
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Restrict commits by author (email) to existing GitLab users.
+                            Restrict commits by author (email) to existing GitLab users.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not signed through GPG.
+                            Reject commit when it’s not signed through GPG.
+                          type: boolean
+                      type: object
+                    type: array
+                  releasesAccessLevel:
+                    description: |-
+                      (String) Set the releases access level. Valid values are disabled, private, enabled.
+                      Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  removeSourceBranchAfterMerge:
+                    description: |-
+                      (Boolean) Enable Delete source branch option by default for all new merge requests.
+                      Enable `Delete source branch` option by default for all new merge requests.
+                    type: boolean
+                  repositoryAccessLevel:
+                    description: |-
+                      (String) Set the repository access level. Valid values are disabled, private, enabled.
+                      Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  repositoryStorage:
+                    description: |-
+                      (String) Which storage shard the repository is on. (administrator only)
+                      Which storage shard the repository is on. (administrator only)
+                    type: string
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requirementsAccessLevel:
+                    description: |-
+                      (String) Set the requirements access level. Valid values are disabled, private, enabled.
+                      Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  resolveOutdatedDiffDiscussions:
+                    description: |-
+                      (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+                      Automatically resolve merge request diffs discussions on lines changed with a push.
+                    type: boolean
+                  restrictUserDefinedVariables:
+                    description: |-
+                      defined variables when triggering a pipeline.
+                      Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+                    type: boolean
+                  securityAndComplianceAccessLevel:
+                    description: |-
+                      (String) Set the security and compliance access level. Valid values are disabled, private, enabled.
+                      Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  sharedRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable shared runners for this project.
+                      Enable shared runners for this project.
+                    type: boolean
+                  skipWaitForDefaultBranchProtection:
+                    description: |-
+                      level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                      If `true`, the default behavior to wait for the default branch protection to be created is skipped.
+                      This is necessary if the current user is not an admin and the default branch protection is disabled on an instance-level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                    type: boolean
+                  snippetsAccessLevel:
+                    description: |-
+                      (String) Set the snippets access level. Valid values are disabled, private, enabled.
+                      Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  snippetsEnabled:
+                    description: |-
+                      (Boolean) Enable snippets for the project.
+                      Enable snippets for the project.
+                    type: boolean
+                  squashCommitTemplate:
+                    description: |-
+                      (String) Template used to create squash commit message in merge requests.
+                      Template used to create squash commit message in merge requests.
+                    type: string
+                  squashOption:
+                    description: |-
+                      (String) Squash commits when merge request is merged. Valid values are never (Do not allow), always (Require), default_on (Encourage), or default_off (Allow). The default value is default_off (Allow).
+                      Squash commits when merge request is merged. Valid values are `never` (Do not allow), `always` (Require), `default_on` (Encourage), or `default_off` (Allow). The default value is `default_off` (Allow).
+                    type: string
+                  suggestionCommitMessage:
+                    description: |-
+                      (String) The commit message used to apply merge request suggestions.
+                      The commit message used to apply merge request suggestions.
+                    type: string
+                  tags:
+                    description: |-
+                      (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                      The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  templateName:
+                    description: |-
+                      in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with template_project_id.
+                      When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
+                    type: string
+                  templateProjectId:
+                    description: |-
+                      (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with template_name. See gitlab_group_project_file_template to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                      When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                    type: number
+                  topics:
+                    description: |-
+                      (Set of String) The list of topics for the project.
+                      The list of topics for the project.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  useCustomTemplate:
+                    description: |-
+                      (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, Group Tokens won't work. You must use a real user's Personal Access Token.
+                      Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting/#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
+                    type: boolean
+                  visibilityLevel:
+                    description: |-
+                      (String) Set to public to create a public project. Valid values are private, internal, public.
+                      Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) Set the wiki access level. Valid values are disabled, private, enabled.
+                      Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  wikiEnabled:
+                    description: |-
+                      (Boolean) Enable wiki for the project.
+                      Enable wiki for the project.
+                    type: boolean
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  allowMergeOnSkippedPipeline:
+                    description: |-
+                      (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
+                      Set to true if you want to treat skipped pipelines as if they finished with success.
+                    type: boolean
+                  allowPipelineTriggerApproveDeployment:
+                    description: |-
+                      (Boolean) Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                      Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                    type: boolean
+                  analyticsAccessLevel:
+                    description: |-
+                      (String) Set the analytics access level. Valid values are disabled, private, enabled.
+                      Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  approvalsBeforeMerge:
+                    description: |-
+                      (Number) Number of merge request approvals required for merging. Default is 0.
+                      This field does not work well in combination with the gitlab_project_approval_rule resource
+                      and is most likely gonna be deprecated in a future GitLab version (see this upstream epic).
+                      In the meantime we recommend against using this attribute and use gitlab_project_approval_rule instead.
+                      Number of merge request approvals required for merging. Default is 0.
+                      This field **does not** work well in combination with the `gitlab_project_approval_rule` resource
+                      and is most likely gonna be deprecated in a future GitLab version (see [this upstream epic](https://gitlab.com/groups/gitlab-org/-/epics/7572)).
+                      In the meantime we recommend against using this attribute and use `gitlab_project_approval_rule` instead.
+                    type: number
+                  archiveOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to archive the project instead of deleting on destroy. If set to true it will entire omit the DELETE operation.
+                      Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
+                    type: boolean
+                  archived:
+                    description: |-
+                      only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                      Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                    type: boolean
+                  autoCancelPendingPipelines:
+                    description: |-
+                      cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                      Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                    type: string
+                  autoDevopsDeployStrategy:
+                    description: |-
+                      (String) Auto Deploy strategy. Valid values are continuous, manual, timed_incremental.
+                      Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
+                    type: string
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Enable Auto DevOps for this project.
+                      Enable Auto DevOps for this project.
+                    type: boolean
+                  autocloseReferencedIssues:
+                    description: |-
+                      closing referenced issues on default branch.
+                      Set whether auto-closing referenced issues on default branch.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  buildCoverageRegex:
+                    description: |-
+                      (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                      Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                    type: string
+                  buildGitStrategy:
+                    description: |-
+                      (String) The Git strategy. Defaults to fetch. Valid values are clone, fetch.
+                      The Git strategy. Defaults to fetch. Valid values are `clone`, `fetch`.
+                    type: string
+                  buildTimeout:
+                    description: |-
+                      (Number) The maximum amount of time, in seconds, that a job can run.
+                      The maximum amount of time, in seconds, that a job can run.
+                    type: number
+                  buildsAccessLevel:
+                    description: |-
+                      (String) Set the builds access level. Valid values are disabled, private, enabled.
+                      Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  ciConfigPath:
+                    description: |-
+                      (String) Custom Path to CI config file.
+                      Custom Path to CI config file.
+                    type: string
+                  ciDefaultGitDepth:
+                    description: |-
+                      (Number) Default number of revisions for shallow cloning.
+                      Default number of revisions for shallow cloning.
+                    type: number
+                  ciDeletePipelinesInSeconds:
+                    description: |-
+                      (Number) Pipelines older than the configured time are deleted.
+                      Pipelines older than the configured time are deleted.
+                    type: number
+                  ciForwardDeploymentEnabled:
+                    description: |-
+                      (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+                      When a new deployment job starts, skip older deployment jobs that are still pending.
+                    type: boolean
+                  ciIdTokenSubClaimComponents:
+                    description: |-
+                      (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                      Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                    items:
+                      type: string
+                    type: array
+                  ciPipelineVariablesMinimumOverrideRole:
+                    description: |-
+                      (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are developer, maintainer, owner, no_one_allowed
+                      The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
+                    type: string
+                  ciRestrictPipelineCancellationRole:
+                    description: |-
+                      (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are developer, maintainer, no one
+                      The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+                    type: string
+                  ciSeparatedCaches:
+                    description: |-
+                      (Boolean) Use separate caches for protected branches.
+                      Use separate caches for protected branches.
+                    type: boolean
+                  containerExpirationPolicy:
+                    description: |-
+                      (Block List, Max: 1) Set the image cleanup policy for this project. Note: this field is sometimes named container_expiration_policy_attributes in the GitLab Upstream API. (see below for nested schema)
+                      Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API.
+                    items:
+                      properties:
+                        cadence:
+                          description: |-
+                            (String) The cadence of the policy. Valid values are: 1d, 7d, 14d, 1month, 3month.
+                            The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
+                          type: string
+                        enabled:
+                          description: |-
+                            (Boolean) If true, the policy is enabled.
+                            If true, the policy is enabled.
+                          type: boolean
+                        keepN:
+                          description: |-
+                            (Number) The number of images to keep.
+                            The number of images to keep.
+                          type: number
+                        nameRegex:
+                          description: |-
+                            (String, Deprecated) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexDelete:
+                          description: |-
+                            (String) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexKeep:
+                          description: |-
+                            (String) The regular expression to match image names to keep.
+                            The regular expression to match image names to keep.
+                          type: string
+                        olderThan:
+                          description: |-
+                            (String) The number of days to keep images.
+                            The number of days to keep images.
+                          type: string
+                      type: object
+                    type: array
+                  containerRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of container registry, for this project. Valid values are disabled, private, enabled.
+                      Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  containerRegistryEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable container registry for the project.
+                      Enable container registry for the project.
+                    type: boolean
+                  defaultBranch:
+                    description: |-
+                      (String) The default branch for the project.
+                      The default branch for the project.
+                    type: string
+                  description:
+                    description: |-
+                      (String) A description of the project.
+                      A description of the project.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  environmentsAccessLevel:
+                    description: |-
+                      (String) Set the environments access level. Valid values are disabled, private, enabled.
+                      Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  externalAuthorizationClassificationLabel:
+                    description: |-
+                      (String) The classification label for the project.
+                      The classification label for the project.
+                    type: string
+                  featureFlagsAccessLevel:
+                    description: |-
+                      (String) Set the feature flags access level. Valid values are disabled, private, enabled.
+                      Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  forkedFromProjectId:
+                    description: |-
+                      (Number) The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                      The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                    type: number
+                  forkingAccessLevel:
+                    description: |-
+                      (String) Set the forking access level. Valid values are disabled, private, enabled.
+                      Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  groupRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable group runners for this project.
+                      Enable group runners for this project.
+                    type: boolean
+                  groupWithProjectTemplatesId:
+                    description: |-
+                      level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                      For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                    type: number
+                  importUrl:
+                    description: |-
+                      (String) Git URL to a repository to be imported. Together with mirror = true it will setup a Pull Mirror. This can also be used together with forked_from_project_id to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in import_url_username and import_url_password. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                      Git URL to a repository to be imported. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                    type: string
+                  importUrlPasswordSecretRef:
+                    description: |-
+                      (String, Sensitive) The password for the import_url. The value of this field is used to construct a valid import_url and is only related to the provider. See the examples section for how to properly use it.
+                      The password for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. See the examples section for how to properly use it.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                      namespace:
+                        description: Namespace of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    - namespace
+                    type: object
+                  importUrlUsername:
+                    description: |-
+                      (String) The username for the import_url. The value of this field is used to construct a valid import_url and is only related to the provider.  See the examples section for how to properly use it.
+                      The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider.  See the examples section for how to properly use it.
+                    type: string
+                  infrastructureAccessLevel:
+                    description: |-
+                      (String) Set the infrastructure access level. Valid values are disabled, private, enabled.
+                      Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  initializeWithReadme:
+                    description: |-
+                      (Boolean) Create main branch with first commit containing a README.md file. Must be set to true if importing an uninitialized project with a different default_branch.
+                      Create main branch with first commit containing a README.md file. Must be set to `true` if importing an uninitialized project with a different `default_branch`.
+                    type: boolean
+                  issuesAccessLevel:
+                    description: |-
+                      (String) Set the issues access level. Valid values are disabled, private, enabled.
+                      Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  issuesEnabled:
+                    description: |-
+                      (Boolean) Enable issue tracking for the project.
+                      Enable issue tracking for the project.
+                    type: boolean
+                  issuesTemplate:
+                    description: |-
+                      (String) Sets the template for new issues in the project.
+                      Sets the template for new issues in the project.
+                    type: string
+                  keepLatestArtifact:
+                    description: |-
+                      (Boolean) Disable or enable the ability to keep the latest artifact for this project.
+                      Disable or enable the ability to keep the latest artifact for this project.
+                    type: boolean
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable LFS for the project.
+                      Enable LFS for the project.
+                    type: boolean
+                  mergeCommitTemplate:
+                    description: |-
+                      (String) Template used to create merge commit message in merge requests.
+                      Template used to create merge commit message in merge requests.
+                    type: string
+                  mergeMethod:
+                    description: |-
+                      (String) Set the merge method. Valid values are merge, rebase_merge, ff.
+                      Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
+                    type: string
+                  mergePipelinesEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge pipelines.
+                      Enable or disable merge pipelines.
+                    type: boolean
+                  mergeRequestsAccessLevel:
+                    description: |-
+                      (String) Set the merge requests access level. Valid values are disabled, private, enabled.
+                      Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mergeRequestsEnabled:
+                    description: |-
+                      (Boolean) Enable merge requests for the project.
+                      Enable merge requests for the project.
+                    type: boolean
+                  mergeRequestsTemplate:
+                    description: |-
+                      (String) Sets the template for new merge requests in the project.
+                      Sets the template for new merge requests in the project.
+                    type: string
+                  mergeTrainsEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge trains. Requires merge_pipelines_enabled to be set to true to take effect.
+                      Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
+                    type: boolean
+                  mirror:
+                    description: |-
+                      (Boolean) Enable project pull mirror.
+                      Enable project pull mirror.
+                    type: boolean
+                  mirrorOverwritesDivergedBranches:
+                    description: |-
+                      (Boolean) Enable overwrite diverged branches for a mirrored project.
+                      Enable overwrite diverged branches for a mirrored project.
+                    type: boolean
+                  mirrorTriggerBuilds:
+                    description: |-
+                      (Boolean) Enable trigger builds on pushes for a mirrored project.
+                      Enable trigger builds on pushes for a mirrored project.
+                    type: boolean
+                  modelExperimentsAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model experiments. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model experiments. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  modelRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model registry. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  monitorAccessLevel:
+                    description: |-
+                      (String) Set the monitor access level. Valid values are disabled, private, enabled.
+                      Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mrDefaultTargetSelf:
+                    description: |-
+                      (Boolean) For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                      For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the project.
+                      The name of the project.
+                    type: string
+                  namespaceId:
+                    description: |-
+                      (Number) The namespace (group or user) of the project. Defaults to your user.
+                      The namespace (group or user) of the project. Defaults to your user.
+                    type: number
+                  namespaceIdRef:
+                    description: Reference to a Group in gitlab-v2 to populate namespaceId.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  namespaceIdSelector:
+                    description: Selector for a Group in gitlab-v2 to populate namespaceId.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  onlyAllowMergeIfAllDiscussionsAreResolved:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if all discussions are resolved.
+                      Set to true if you want allow merges only if all discussions are resolved.
+                    type: boolean
+                  onlyAllowMergeIfPipelineSucceeds:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
+                      Set to true if you want allow merges only if a pipeline succeeds.
+                    type: boolean
+                  onlyMirrorProtectedBranches:
+                    description: |-
+                      (Boolean) Enable only mirror protected branches for a mirrored project.
+                      Enable only mirror protected branches for a mirrored project.
+                    type: boolean
+                  packagesEnabled:
+                    description: |-
+                      (Boolean) Enable packages repository for the project.
+                      Enable packages repository for the project.
+                    type: boolean
+                  pagesAccessLevel:
+                    description: |-
+                      (String) Enable pages access control. Valid values are public, private, enabled, disabled.
+                      Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
+                    type: string
+                  path:
+                    description: |-
+                      (String) The path of the repository.
+                      The path of the repository.
+                    type: string
+                  permanentlyDeleteOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                      Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                    type: boolean
+                  pipelinesEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable pipelines for the project. The pipelines_enabled field is being sent as jobs_enabled in the GitLab API calls.
+                      Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
+                    type: boolean
+                  preReceiveSecretDetectionEnabled:
+                    description: |-
+                      (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                      Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                    type: boolean
+                  preventMergeWithoutJiraIssue:
+                    description: |-
+                      (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                      Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                    type: boolean
+                  printingMergeRequestLinkEnabled:
+                    description: |-
+                      (Boolean) Show link to create/view merge request when pushing from the command line
+                      Show link to create/view merge request when pushing from the command line
+                    type: boolean
+                  publicBuilds:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  publicJobs:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the project. (see below for nested schema)
+                      Push rules for the project.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
+                            Users can only push commits to this repository that were committed with one of their own verified emails.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, e.g. ssh\:\/\/.
+                            No commit message is allowed to match this regex, e.g. `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) All committed filenames must not match this regex, e.g. (jar|exe)$.
+                            All committed filenames must not match this regex, e.g. `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB).
+                            Maximum file size (MB).
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Restrict commits by author (email) to existing GitLab users.
+                            Restrict commits by author (email) to existing GitLab users.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not signed through GPG.
+                            Reject commit when it’s not signed through GPG.
+                          type: boolean
+                      type: object
+                    type: array
+                  releasesAccessLevel:
+                    description: |-
+                      (String) Set the releases access level. Valid values are disabled, private, enabled.
+                      Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  removeSourceBranchAfterMerge:
+                    description: |-
+                      (Boolean) Enable Delete source branch option by default for all new merge requests.
+                      Enable `Delete source branch` option by default for all new merge requests.
+                    type: boolean
+                  repositoryAccessLevel:
+                    description: |-
+                      (String) Set the repository access level. Valid values are disabled, private, enabled.
+                      Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  repositoryStorage:
+                    description: |-
+                      (String) Which storage shard the repository is on. (administrator only)
+                      Which storage shard the repository is on. (administrator only)
+                    type: string
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requirementsAccessLevel:
+                    description: |-
+                      (String) Set the requirements access level. Valid values are disabled, private, enabled.
+                      Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  resolveOutdatedDiffDiscussions:
+                    description: |-
+                      (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+                      Automatically resolve merge request diffs discussions on lines changed with a push.
+                    type: boolean
+                  restrictUserDefinedVariables:
+                    description: |-
+                      defined variables when triggering a pipeline.
+                      Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+                    type: boolean
+                  securityAndComplianceAccessLevel:
+                    description: |-
+                      (String) Set the security and compliance access level. Valid values are disabled, private, enabled.
+                      Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  sharedRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable shared runners for this project.
+                      Enable shared runners for this project.
+                    type: boolean
+                  skipWaitForDefaultBranchProtection:
+                    description: |-
+                      level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                      If `true`, the default behavior to wait for the default branch protection to be created is skipped.
+                      This is necessary if the current user is not an admin and the default branch protection is disabled on an instance-level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                    type: boolean
+                  snippetsAccessLevel:
+                    description: |-
+                      (String) Set the snippets access level. Valid values are disabled, private, enabled.
+                      Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  snippetsEnabled:
+                    description: |-
+                      (Boolean) Enable snippets for the project.
+                      Enable snippets for the project.
+                    type: boolean
+                  squashCommitTemplate:
+                    description: |-
+                      (String) Template used to create squash commit message in merge requests.
+                      Template used to create squash commit message in merge requests.
+                    type: string
+                  squashOption:
+                    description: |-
+                      (String) Squash commits when merge request is merged. Valid values are never (Do not allow), always (Require), default_on (Encourage), or default_off (Allow). The default value is default_off (Allow).
+                      Squash commits when merge request is merged. Valid values are `never` (Do not allow), `always` (Require), `default_on` (Encourage), or `default_off` (Allow). The default value is `default_off` (Allow).
+                    type: string
+                  suggestionCommitMessage:
+                    description: |-
+                      (String) The commit message used to apply merge request suggestions.
+                      The commit message used to apply merge request suggestions.
+                    type: string
+                  tags:
+                    description: |-
+                      (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                      The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  templateName:
+                    description: |-
+                      in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with template_project_id.
+                      When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
+                    type: string
+                  templateProjectId:
+                    description: |-
+                      (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with template_name. See gitlab_group_project_file_template to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                      When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                    type: number
+                  topics:
+                    description: |-
+                      (Set of String) The list of topics for the project.
+                      The list of topics for the project.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  useCustomTemplate:
+                    description: |-
+                      (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, Group Tokens won't work. You must use a real user's Personal Access Token.
+                      Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting/#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
+                    type: boolean
+                  visibilityLevel:
+                    description: |-
+                      (String) Set to public to create a public project. Valid values are private, internal, public.
+                      Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) Set the wiki access level. Valid values are disabled, private, enabled.
+                      Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  wikiEnabled:
+                    description: |-
+                      (Boolean) Enable wiki for the project.
+                      Enable wiki for the project.
+                    type: boolean
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  This field is planned to replace the DeletionPolicy field in a future
+                  release. Currently, both could be set independently and non-default
+                  values would be honored if the feature flag is enabled. If both are
+                  custom, the DeletionPolicy field will be ignored.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.name is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
+                || (has(self.initProvider) && has(self.initProvider.name))'
+          status:
+            description: ProjectStatus defines the observed state of Project.
+            properties:
+              atProvider:
+                properties:
+                  allowMergeOnSkippedPipeline:
+                    description: |-
+                      (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
+                      Set to true if you want to treat skipped pipelines as if they finished with success.
+                    type: boolean
+                  allowPipelineTriggerApproveDeployment:
+                    description: |-
+                      (Boolean) Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                      Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
+                    type: boolean
+                  analyticsAccessLevel:
+                    description: |-
+                      (String) Set the analytics access level. Valid values are disabled, private, enabled.
+                      Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  approvalsBeforeMerge:
+                    description: |-
+                      (Number) Number of merge request approvals required for merging. Default is 0.
+                      This field does not work well in combination with the gitlab_project_approval_rule resource
+                      and is most likely gonna be deprecated in a future GitLab version (see this upstream epic).
+                      In the meantime we recommend against using this attribute and use gitlab_project_approval_rule instead.
+                      Number of merge request approvals required for merging. Default is 0.
+                      This field **does not** work well in combination with the `gitlab_project_approval_rule` resource
+                      and is most likely gonna be deprecated in a future GitLab version (see [this upstream epic](https://gitlab.com/groups/gitlab-org/-/epics/7572)).
+                      In the meantime we recommend against using this attribute and use `gitlab_project_approval_rule` instead.
+                    type: number
+                  archiveOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to archive the project instead of deleting on destroy. If set to true it will entire omit the DELETE operation.
+                      Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
+                    type: boolean
+                  archived:
+                    description: |-
+                      only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                      Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+                    type: boolean
+                  autoCancelPendingPipelines:
+                    description: |-
+                      cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                      Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+                    type: string
+                  autoDevopsDeployStrategy:
+                    description: |-
+                      (String) Auto Deploy strategy. Valid values are continuous, manual, timed_incremental.
+                      Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
+                    type: string
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Enable Auto DevOps for this project.
+                      Enable Auto DevOps for this project.
+                    type: boolean
+                  autocloseReferencedIssues:
+                    description: |-
+                      closing referenced issues on default branch.
+                      Set whether auto-closing referenced issues on default branch.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  avatarUrl:
+                    description: |-
+                      (String) The URL of the avatar image.
+                      The URL of the avatar image.
+                    type: string
+                  buildCoverageRegex:
+                    description: |-
+                      (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                      Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
+                    type: string
+                  buildGitStrategy:
+                    description: |-
+                      (String) The Git strategy. Defaults to fetch. Valid values are clone, fetch.
+                      The Git strategy. Defaults to fetch. Valid values are `clone`, `fetch`.
+                    type: string
+                  buildTimeout:
+                    description: |-
+                      (Number) The maximum amount of time, in seconds, that a job can run.
+                      The maximum amount of time, in seconds, that a job can run.
+                    type: number
+                  buildsAccessLevel:
+                    description: |-
+                      (String) Set the builds access level. Valid values are disabled, private, enabled.
+                      Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  ciConfigPath:
+                    description: |-
+                      (String) Custom Path to CI config file.
+                      Custom Path to CI config file.
+                    type: string
+                  ciDefaultGitDepth:
+                    description: |-
+                      (Number) Default number of revisions for shallow cloning.
+                      Default number of revisions for shallow cloning.
+                    type: number
+                  ciDeletePipelinesInSeconds:
+                    description: |-
+                      (Number) Pipelines older than the configured time are deleted.
+                      Pipelines older than the configured time are deleted.
+                    type: number
+                  ciForwardDeploymentEnabled:
+                    description: |-
+                      (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+                      When a new deployment job starts, skip older deployment jobs that are still pending.
+                    type: boolean
+                  ciIdTokenSubClaimComponents:
+                    description: |-
+                      (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                      Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
+                    items:
+                      type: string
+                    type: array
+                  ciPipelineVariablesMinimumOverrideRole:
+                    description: |-
+                      (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are developer, maintainer, owner, no_one_allowed
+                      The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
+                    type: string
+                  ciRestrictPipelineCancellationRole:
+                    description: |-
+                      (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are developer, maintainer, no one
+                      The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+                    type: string
+                  ciSeparatedCaches:
+                    description: |-
+                      (Boolean) Use separate caches for protected branches.
+                      Use separate caches for protected branches.
+                    type: boolean
+                  containerExpirationPolicy:
+                    description: |-
+                      (Block List, Max: 1) Set the image cleanup policy for this project. Note: this field is sometimes named container_expiration_policy_attributes in the GitLab Upstream API. (see below for nested schema)
+                      Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API.
+                    items:
+                      properties:
+                        cadence:
+                          description: |-
+                            (String) The cadence of the policy. Valid values are: 1d, 7d, 14d, 1month, 3month.
+                            The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
+                          type: string
+                        enabled:
+                          description: |-
+                            (Boolean) If true, the policy is enabled.
+                            If true, the policy is enabled.
+                          type: boolean
+                        keepN:
+                          description: |-
+                            (Number) The number of images to keep.
+                            The number of images to keep.
+                          type: number
+                        nameRegex:
+                          description: |-
+                            (String, Deprecated) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexDelete:
+                          description: |-
+                            (String) The regular expression to match image names to delete.
+                            The regular expression to match image names to delete.
+                          type: string
+                        nameRegexKeep:
+                          description: |-
+                            (String) The regular expression to match image names to keep.
+                            The regular expression to match image names to keep.
+                          type: string
+                        nextRunAt:
+                          description: |-
+                            (String) The next time the policy will run.
+                            The next time the policy will run.
+                          type: string
+                        olderThan:
+                          description: |-
+                            (String) The number of days to keep images.
+                            The number of days to keep images.
+                          type: string
+                      type: object
+                    type: array
+                  containerRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of container registry, for this project. Valid values are disabled, private, enabled.
+                      Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  containerRegistryEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable container registry for the project.
+                      Enable container registry for the project.
+                    type: boolean
+                  defaultBranch:
+                    description: |-
+                      (String) The default branch for the project.
+                      The default branch for the project.
+                    type: string
+                  description:
+                    description: |-
+                      (String) A description of the project.
+                      A description of the project.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  emptyRepo:
+                    description: |-
+                      (Boolean) Whether the project is empty.
+                      Whether the project is empty.
+                    type: boolean
+                  environmentsAccessLevel:
+                    description: |-
+                      (String) Set the environments access level. Valid values are disabled, private, enabled.
+                      Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  externalAuthorizationClassificationLabel:
+                    description: |-
+                      (String) The classification label for the project.
+                      The classification label for the project.
+                    type: string
+                  featureFlagsAccessLevel:
+                    description: |-
+                      (String) Set the feature flags access level. Valid values are disabled, private, enabled.
+                      Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  forkedFromProjectId:
+                    description: |-
+                      (Number) The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                      The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
+                    type: number
+                  forkingAccessLevel:
+                    description: |-
+                      (String) Set the forking access level. Valid values are disabled, private, enabled.
+                      Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  groupRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable group runners for this project.
+                      Enable group runners for this project.
+                    type: boolean
+                  groupWithProjectTemplatesId:
+                    description: |-
+                      level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                      For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+                    type: number
+                  httpUrlToRepo:
+                    description: |-
+                      (String) URL that can be provided to git clone to clone the
+                      URL that can be provided to `git clone` to clone the
+                    type: string
+                  id:
+                    description: (String) The ID of this resource.
+                    type: string
+                  importUrl:
+                    description: |-
+                      (String) Git URL to a repository to be imported. Together with mirror = true it will setup a Pull Mirror. This can also be used together with forked_from_project_id to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in import_url_username and import_url_password. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                      Git URL to a repository to be imported. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. See the examples section for how to properly use it.
+                    type: string
+                  importUrlUsername:
+                    description: |-
+                      (String) The username for the import_url. The value of this field is used to construct a valid import_url and is only related to the provider.  See the examples section for how to properly use it.
+                      The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider.  See the examples section for how to properly use it.
+                    type: string
+                  infrastructureAccessLevel:
+                    description: |-
+                      (String) Set the infrastructure access level. Valid values are disabled, private, enabled.
+                      Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  initializeWithReadme:
+                    description: |-
+                      (Boolean) Create main branch with first commit containing a README.md file. Must be set to true if importing an uninitialized project with a different default_branch.
+                      Create main branch with first commit containing a README.md file. Must be set to `true` if importing an uninitialized project with a different `default_branch`.
+                    type: boolean
+                  issuesAccessLevel:
+                    description: |-
+                      (String) Set the issues access level. Valid values are disabled, private, enabled.
+                      Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  issuesEnabled:
+                    description: |-
+                      (Boolean) Enable issue tracking for the project.
+                      Enable issue tracking for the project.
+                    type: boolean
+                  issuesTemplate:
+                    description: |-
+                      (String) Sets the template for new issues in the project.
+                      Sets the template for new issues in the project.
+                    type: string
+                  keepLatestArtifact:
+                    description: |-
+                      (Boolean) Disable or enable the ability to keep the latest artifact for this project.
+                      Disable or enable the ability to keep the latest artifact for this project.
+                    type: boolean
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable LFS for the project.
+                      Enable LFS for the project.
+                    type: boolean
+                  mergeCommitTemplate:
+                    description: |-
+                      (String) Template used to create merge commit message in merge requests.
+                      Template used to create merge commit message in merge requests.
+                    type: string
+                  mergeMethod:
+                    description: |-
+                      (String) Set the merge method. Valid values are merge, rebase_merge, ff.
+                      Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
+                    type: string
+                  mergePipelinesEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge pipelines.
+                      Enable or disable merge pipelines.
+                    type: boolean
+                  mergeRequestsAccessLevel:
+                    description: |-
+                      (String) Set the merge requests access level. Valid values are disabled, private, enabled.
+                      Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mergeRequestsEnabled:
+                    description: |-
+                      (Boolean) Enable merge requests for the project.
+                      Enable merge requests for the project.
+                    type: boolean
+                  mergeRequestsTemplate:
+                    description: |-
+                      (String) Sets the template for new merge requests in the project.
+                      Sets the template for new merge requests in the project.
+                    type: string
+                  mergeTrainsEnabled:
+                    description: |-
+                      (Boolean) Enable or disable merge trains. Requires merge_pipelines_enabled to be set to true to take effect.
+                      Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
+                    type: boolean
+                  mirror:
+                    description: |-
+                      (Boolean) Enable project pull mirror.
+                      Enable project pull mirror.
+                    type: boolean
+                  mirrorOverwritesDivergedBranches:
+                    description: |-
+                      (Boolean) Enable overwrite diverged branches for a mirrored project.
+                      Enable overwrite diverged branches for a mirrored project.
+                    type: boolean
+                  mirrorTriggerBuilds:
+                    description: |-
+                      (Boolean) Enable trigger builds on pushes for a mirrored project.
+                      Enable trigger builds on pushes for a mirrored project.
+                    type: boolean
+                  modelExperimentsAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model experiments. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model experiments. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  modelRegistryAccessLevel:
+                    description: |-
+                      (String) Set visibility of machine learning model registry. Valid values are disabled, private, enabled.
+                      Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  monitorAccessLevel:
+                    description: |-
+                      (String) Set the monitor access level. Valid values are disabled, private, enabled.
+                      Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  mrDefaultTargetSelf:
+                    description: |-
+                      (Boolean) For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                      For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the project.
+                      The name of the project.
+                    type: string
+                  namespaceId:
+                    description: |-
+                      (Number) The namespace (group or user) of the project. Defaults to your user.
+                      The namespace (group or user) of the project. Defaults to your user.
+                    type: number
+                  onlyAllowMergeIfAllDiscussionsAreResolved:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if all discussions are resolved.
+                      Set to true if you want allow merges only if all discussions are resolved.
+                    type: boolean
+                  onlyAllowMergeIfPipelineSucceeds:
+                    description: |-
+                      (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
+                      Set to true if you want allow merges only if a pipeline succeeds.
+                    type: boolean
+                  onlyMirrorProtectedBranches:
+                    description: |-
+                      (Boolean) Enable only mirror protected branches for a mirrored project.
+                      Enable only mirror protected branches for a mirrored project.
+                    type: boolean
+                  packagesEnabled:
+                    description: |-
+                      (Boolean) Enable packages repository for the project.
+                      Enable packages repository for the project.
+                    type: boolean
+                  pagesAccessLevel:
+                    description: |-
+                      (String) Enable pages access control. Valid values are public, private, enabled, disabled.
+                      Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
+                    type: string
+                  path:
+                    description: |-
+                      (String) The path of the repository.
+                      The path of the repository.
+                    type: string
+                  pathWithNamespace:
+                    description: |-
+                      (String) The path of the repository with namespace.
+                      The path of the repository with namespace.
+                    type: string
+                  permanentlyDeleteOnDestroy:
+                    description: |-
+                      (Boolean) Set to true to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                      Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
+                    type: boolean
+                  pipelinesEnabled:
+                    description: |-
+                      (Boolean, Deprecated) Enable pipelines for the project. The pipelines_enabled field is being sent as jobs_enabled in the GitLab API calls.
+                      Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
+                    type: boolean
+                  preReceiveSecretDetectionEnabled:
+                    description: |-
+                      (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                      Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+                    type: boolean
+                  preventMergeWithoutJiraIssue:
+                    description: |-
+                      (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                      Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
+                    type: boolean
+                  printingMergeRequestLinkEnabled:
+                    description: |-
+                      (Boolean) Show link to create/view merge request when pushing from the command line
+                      Show link to create/view merge request when pushing from the command line
+                    type: boolean
+                  publicBuilds:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  publicJobs:
+                    description: |-
+                      project members.
+                      If true, jobs can be viewed by non-project members.
+                    type: boolean
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the project. (see below for nested schema)
+                      Push rules for the project.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
+                            Users can only push commits to this repository that were committed with one of their own verified emails.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, e.g. ssh\:\/\/.
+                            No commit message is allowed to match this regex, e.g. `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) All committed filenames must not match this regex, e.g. (jar|exe)$.
+                            All committed filenames must not match this regex, e.g. `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB).
+                            Maximum file size (MB).
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Restrict commits by author (email) to existing GitLab users.
+                            Restrict commits by author (email) to existing GitLab users.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not signed through GPG.
+                            Reject commit when it’s not signed through GPG.
+                          type: boolean
+                      type: object
+                    type: array
+                  releasesAccessLevel:
+                    description: |-
+                      (String) Set the releases access level. Valid values are disabled, private, enabled.
+                      Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  removeSourceBranchAfterMerge:
+                    description: |-
+                      (Boolean) Enable Delete source branch option by default for all new merge requests.
+                      Enable `Delete source branch` option by default for all new merge requests.
+                    type: boolean
+                  repositoryAccessLevel:
+                    description: |-
+                      (String) Set the repository access level. Valid values are disabled, private, enabled.
+                      Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  repositoryStorage:
+                    description: |-
+                      (String) Which storage shard the repository is on. (administrator only)
+                      Which storage shard the repository is on. (administrator only)
+                    type: string
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requirementsAccessLevel:
+                    description: |-
+                      (String) Set the requirements access level. Valid values are disabled, private, enabled.
+                      Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  resolveOutdatedDiffDiscussions:
+                    description: |-
+                      (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+                      Automatically resolve merge request diffs discussions on lines changed with a push.
+                    type: boolean
+                  restrictUserDefinedVariables:
+                    description: |-
+                      defined variables when triggering a pipeline.
+                      Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+                    type: boolean
+                  securityAndComplianceAccessLevel:
+                    description: |-
+                      (String) Set the security and compliance access level. Valid values are disabled, private, enabled.
+                      Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  sharedRunnersEnabled:
+                    description: |-
+                      (Boolean) Enable shared runners for this project.
+                      Enable shared runners for this project.
+                    type: boolean
+                  skipWaitForDefaultBranchProtection:
+                    description: |-
+                      level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                      If `true`, the default behavior to wait for the default branch protection to be created is skipped.
+                      This is necessary if the current user is not an admin and the default branch protection is disabled on an instance-level.
+                      There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+                      This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+                    type: boolean
+                  snippetsAccessLevel:
+                    description: |-
+                      (String) Set the snippets access level. Valid values are disabled, private, enabled.
+                      Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  snippetsEnabled:
+                    description: |-
+                      (Boolean) Enable snippets for the project.
+                      Enable snippets for the project.
+                    type: boolean
+                  squashCommitTemplate:
+                    description: |-
+                      (String) Template used to create squash commit message in merge requests.
+                      Template used to create squash commit message in merge requests.
+                    type: string
+                  squashOption:
+                    description: |-
+                      (String) Squash commits when merge request is merged. Valid values are never (Do not allow), always (Require), default_on (Encourage), or default_off (Allow). The default value is default_off (Allow).
+                      Squash commits when merge request is merged. Valid values are `never` (Do not allow), `always` (Require), `default_on` (Encourage), or `default_off` (Allow). The default value is `default_off` (Allow).
+                    type: string
+                  sshUrlToRepo:
+                    description: |-
+                      (String) URL that can be provided to git clone to clone the
+                      URL that can be provided to `git clone` to clone the
+                    type: string
+                  suggestionCommitMessage:
+                    description: |-
+                      (String) The commit message used to apply merge request suggestions.
+                      The commit message used to apply merge request suggestions.
+                    type: string
+                  tags:
+                    description: |-
+                      (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                      The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  templateName:
+                    description: |-
+                      in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with template_project_id.
+                      When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
+                    type: string
+                  templateProjectId:
+                    description: |-
+                      (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with template_name. See gitlab_group_project_file_template to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                      When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+                    type: number
+                  topics:
+                    description: |-
+                      (Set of String) The list of topics for the project.
+                      The list of topics for the project.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  useCustomTemplate:
+                    description: |-
+                      (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, Group Tokens won't work. You must use a real user's Personal Access Token.
+                      Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+                      ~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting/#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
+                    type: boolean
+                  visibilityLevel:
+                    description: |-
+                      (String) Set to public to create a public project. Valid values are private, internal, public.
+                      Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
+                    type: string
+                  webUrl:
+                    description: |-
+                      (String) URL that can be used to find the project in a browser.
+                      URL that can be used to find the project in a browser.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) Set the wiki access level. Valid values are disabled, private, enabled.
+                      Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                  wikiEnabled:
+                    description: |-
+                      (Boolean) Enable wiki for the project.
+                      Enable wiki for the project.
+                    type: boolean
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

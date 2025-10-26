@@ -9,15 +9,27 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
-	resource "github.com/crossplane/upjet-provider-template/internal/controller/cluster/null/resource"
-	providerconfig "github.com/crossplane/upjet-provider-template/internal/controller/cluster/providerconfig"
+	file "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/file"
+	group "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/group"
+	groupmembership "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/groupmembership"
+	project "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/project"
+	projectmembership "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/projectmembership"
+	projectsharegroup "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/projectsharegroup"
+	user "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/gitlab-v2/user"
+	providerconfig "github.com/dana-team/provider-gitlab-v2/internal/controller/cluster/providerconfig"
 )
 
 // Setup creates all controllers with the supplied logger and adds them to
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		resource.Setup,
+		file.Setup,
+		group.Setup,
+		groupmembership.Setup,
+		project.Setup,
+		projectmembership.Setup,
+		projectsharegroup.Setup,
+		user.Setup,
 		providerconfig.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -31,7 +43,13 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // the supplied manager gated.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		resource.SetupGated,
+		file.SetupGated,
+		group.SetupGated,
+		groupmembership.SetupGated,
+		project.SetupGated,
+		projectmembership.SetupGated,
+		projectsharegroup.SetupGated,
+		user.SetupGated,
 		providerconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
