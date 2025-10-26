@@ -1,0 +1,14 @@
+apiVersion: gitlab-v2.m.crossplane.io/v1alpha1
+kind: Project
+metadata:
+  annotations:
+    meta.upbound.io/example-id: gitlab-v2/v1alpha1/project
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+  namespace: crossplane-system
+spec:
+  forProvider:
+    description: My awesome codebase
+    name: example
+    visibilityLevel: public

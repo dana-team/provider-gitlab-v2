@@ -9,7 +9,7 @@ import (
 
 // Package type metadata.
 const (
-	Group   = "template.crossplane.io"
+	Group   = "gitlab-v2.crossplane.io"
 	Version = "v1beta1"
 )
 

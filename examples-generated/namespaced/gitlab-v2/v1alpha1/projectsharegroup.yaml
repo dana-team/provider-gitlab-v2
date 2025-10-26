@@ -1,0 +1,18 @@
+apiVersion: gitlab-v2.m.crossplane.io/v1alpha1
+kind: ProjectShareGroup
+metadata:
+  annotations:
+    meta.upbound.io/example-id: gitlab-v2/v1alpha1/projectsharegroup
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+  namespace: crossplane-system
+spec:
+  forProvider:
+    groupAccess: guest
+    groupIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
+    projectSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example

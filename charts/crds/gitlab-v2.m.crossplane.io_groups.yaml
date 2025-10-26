@@ -1,0 +1,982 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: groups.gitlab-v2.m.crossplane.io
+spec:
+  group: gitlab-v2.m.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - gitlab-v2.m
+    kind: Group
+    listKind: GroupList
+    plural: groups
+    singular: group
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'Group is the Schema for the Groups API. The gitlab_group resource
+          allows to manage the lifecycle of a group. -> On GitLab SaaS, you must use
+          the GitLab UI to create groups without a parent group. You cannot use this
+          provider nor the API to do this. Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: GroupSpec defines the desired state of Group
+            properties:
+              forProvider:
+                properties:
+                  allowedEmailDomainsList:
+                    description: |-
+                      (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                      A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                    items:
+                      type: string
+                    type: array
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Default to Auto DevOps pipeline for all projects within this group.
+                      Default to Auto DevOps pipeline for all projects within this group.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  defaultBranch:
+                    description: |-
+                      (String) Initial default branch name.
+                      Initial default branch name.
+                    type: string
+                  defaultBranchProtection:
+                    description: |-
+                      for-default_branch_protection. Valid values are: 0, 1, 2, 3, 4.
+                      See https://docs.gitlab.com/api/groups/#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
+                    type: number
+                  defaultBranchProtectionDefaults:
+                    description: |-
+                      (Block List, Max: 1) The default branch protection defaults (see below for nested schema)
+                      The default branch protection defaults
+                    items:
+                      properties:
+                        allowForcePush:
+                          description: |-
+                            (Boolean) Allow force push for all users with push access.
+                            Allow force push for all users with push access.
+                          type: boolean
+                        allowedToMerge:
+                          description: |-
+                            (List of String) An array of access levels allowed to merge. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to merge. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        allowedToPush:
+                          description: |-
+                            (List of String) An array of access levels allowed to push. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to push. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        developerCanInitialPush:
+                          description: |-
+                            (Boolean) Allow developers to initial push.
+                            Allow developers to initial push.
+                          type: boolean
+                      type: object
+                    type: array
+                  description:
+                    description: |-
+                      (String) The group's description.
+                      The group's description.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  extraSharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+                      Can be set by administrators only. Additional CI/CD minutes for this group.
+                    type: number
+                  ipRestrictionRanges:
+                    description: |-
+                      (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                      A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                    items:
+                      type: string
+                    type: array
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
+                      Enable/disable Large File Storage (LFS) for the projects in this group.
+                    type: boolean
+                  membershipLock:
+                    description: |-
+                      (Boolean) Users cannot be added to projects in this group.
+                      Users cannot be added to projects in this group.
+                    type: boolean
+                  mentionsDisabled:
+                    description: |-
+                      (Boolean) Disable the capability of a group from getting mentioned.
+                      Disable the capability of a group from getting mentioned.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the group.
+                      The name of the group.
+                    type: string
+                  parentId:
+                    description: |-
+                      (Number) Id of the parent group (creates a nested group).
+                      Id of the parent group (creates a nested group).
+                    type: number
+                  path:
+                    description: |-
+                      (String) The path of the group.
+                      The path of the group.
+                    type: string
+                  permanentlyRemoveOnDelete:
+                    description: |-
+                      (Boolean) Whether the group should be permanently removed during a delete operation. This only works with subgroups. Must be configured via an apply before the destroy is run.
+                      Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
+                    type: boolean
+                  preventForkingOutsideGroup:
+                    description: |-
+                      (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                      Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                    type: boolean
+                  projectCreationLevel:
+                    description: |-
+                      (String) Determine if developers can create projects in the group. Valid values are: noone, owner, maintainer, developer
+                      Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`
+                    type: string
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the group. (see below for nested schema)
+                      Push rules for the group.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Only commits pushed using verified emails are allowed.
+                            Only commits pushed using verified emails are allowed.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, for example ssh\:\/\/.
+                            No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) Filenames matching the regular expression provided in this attribute are not allowed, for example, (jar|exe)$.
+                            Filenames matching the regular expression provided in this attribute are not allowed, for example, `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB) allowed.
+                            Maximum file size (MB) allowed.
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Allows only GitLab users to author commits.
+                            Allows only GitLab users to author commits.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Only commits signed through GPG are allowed.
+                            Only commits signed through GPG are allowed.
+                          type: boolean
+                      type: object
+                    type: array
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requireTwoFactorAuthentication:
+                    description: |-
+                      factor authentication.
+                      Require all users in this group to setup Two-factor authentication.
+                    type: boolean
+                  shareWithGroupLock:
+                    description: |-
+                      (Boolean) Prevent sharing a project with another group within this group.
+                      Prevent sharing a project with another group within this group.
+                    type: boolean
+                  sharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                      Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                    type: number
+                  sharedRunnersSetting:
+                    description: |-
+                      (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: enabled, disabled_and_overridable, disabled_and_unoverridable, disabled_with_override.
+                      Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+                    type: string
+                  subgroupCreationLevel:
+                    description: |-
+                      (String) Allowed to create subgroups. Valid values are: owner, maintainer.
+                      Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
+                    type: string
+                  twoFactorGracePeriod:
+                    description: |-
+                      factor authentication is enforced (in hours).
+                      Defaults to 48. Time before Two-factor authentication is enforced (in hours).
+                    type: number
+                  visibilityLevel:
+                    description: |-
+                      (String) The group's visibility. Can be private, internal, or public. Valid values are: private, internal, public.
+                      The group's visibility. Can be `private`, `internal`, or `public`. Valid values are: `private`, `internal`, `public`.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.
+                      The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  allowedEmailDomainsList:
+                    description: |-
+                      (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                      A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                    items:
+                      type: string
+                    type: array
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Default to Auto DevOps pipeline for all projects within this group.
+                      Default to Auto DevOps pipeline for all projects within this group.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  defaultBranch:
+                    description: |-
+                      (String) Initial default branch name.
+                      Initial default branch name.
+                    type: string
+                  defaultBranchProtection:
+                    description: |-
+                      for-default_branch_protection. Valid values are: 0, 1, 2, 3, 4.
+                      See https://docs.gitlab.com/api/groups/#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
+                    type: number
+                  defaultBranchProtectionDefaults:
+                    description: |-
+                      (Block List, Max: 1) The default branch protection defaults (see below for nested schema)
+                      The default branch protection defaults
+                    items:
+                      properties:
+                        allowForcePush:
+                          description: |-
+                            (Boolean) Allow force push for all users with push access.
+                            Allow force push for all users with push access.
+                          type: boolean
+                        allowedToMerge:
+                          description: |-
+                            (List of String) An array of access levels allowed to merge. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to merge. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        allowedToPush:
+                          description: |-
+                            (List of String) An array of access levels allowed to push. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to push. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        developerCanInitialPush:
+                          description: |-
+                            (Boolean) Allow developers to initial push.
+                            Allow developers to initial push.
+                          type: boolean
+                      type: object
+                    type: array
+                  description:
+                    description: |-
+                      (String) The group's description.
+                      The group's description.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  extraSharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+                      Can be set by administrators only. Additional CI/CD minutes for this group.
+                    type: number
+                  ipRestrictionRanges:
+                    description: |-
+                      (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                      A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                    items:
+                      type: string
+                    type: array
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
+                      Enable/disable Large File Storage (LFS) for the projects in this group.
+                    type: boolean
+                  membershipLock:
+                    description: |-
+                      (Boolean) Users cannot be added to projects in this group.
+                      Users cannot be added to projects in this group.
+                    type: boolean
+                  mentionsDisabled:
+                    description: |-
+                      (Boolean) Disable the capability of a group from getting mentioned.
+                      Disable the capability of a group from getting mentioned.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the group.
+                      The name of the group.
+                    type: string
+                  parentId:
+                    description: |-
+                      (Number) Id of the parent group (creates a nested group).
+                      Id of the parent group (creates a nested group).
+                    type: number
+                  path:
+                    description: |-
+                      (String) The path of the group.
+                      The path of the group.
+                    type: string
+                  permanentlyRemoveOnDelete:
+                    description: |-
+                      (Boolean) Whether the group should be permanently removed during a delete operation. This only works with subgroups. Must be configured via an apply before the destroy is run.
+                      Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
+                    type: boolean
+                  preventForkingOutsideGroup:
+                    description: |-
+                      (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                      Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                    type: boolean
+                  projectCreationLevel:
+                    description: |-
+                      (String) Determine if developers can create projects in the group. Valid values are: noone, owner, maintainer, developer
+                      Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`
+                    type: string
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the group. (see below for nested schema)
+                      Push rules for the group.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Only commits pushed using verified emails are allowed.
+                            Only commits pushed using verified emails are allowed.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, for example ssh\:\/\/.
+                            No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) Filenames matching the regular expression provided in this attribute are not allowed, for example, (jar|exe)$.
+                            Filenames matching the regular expression provided in this attribute are not allowed, for example, `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB) allowed.
+                            Maximum file size (MB) allowed.
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Allows only GitLab users to author commits.
+                            Allows only GitLab users to author commits.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Only commits signed through GPG are allowed.
+                            Only commits signed through GPG are allowed.
+                          type: boolean
+                      type: object
+                    type: array
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requireTwoFactorAuthentication:
+                    description: |-
+                      factor authentication.
+                      Require all users in this group to setup Two-factor authentication.
+                    type: boolean
+                  shareWithGroupLock:
+                    description: |-
+                      (Boolean) Prevent sharing a project with another group within this group.
+                      Prevent sharing a project with another group within this group.
+                    type: boolean
+                  sharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                      Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                    type: number
+                  sharedRunnersSetting:
+                    description: |-
+                      (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: enabled, disabled_and_overridable, disabled_and_unoverridable, disabled_with_override.
+                      Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+                    type: string
+                  subgroupCreationLevel:
+                    description: |-
+                      (String) Allowed to create subgroups. Valid values are: owner, maintainer.
+                      Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
+                    type: string
+                  twoFactorGracePeriod:
+                    description: |-
+                      factor authentication is enforced (in hours).
+                      Defaults to 48. Time before Two-factor authentication is enforced (in hours).
+                    type: number
+                  visibilityLevel:
+                    description: |-
+                      (String) The group's visibility. Can be private, internal, or public. Valid values are: private, internal, public.
+                      The group's visibility. Can be `private`, `internal`, or `public`. Valid values are: `private`, `internal`, `public`.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.
+                      The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  kind: ClusterProviderConfig
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  kind:
+                    description: Kind of the referenced object.
+                    type: string
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.name is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
+                || (has(self.initProvider) && has(self.initProvider.name))'
+            - message: spec.forProvider.path is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.path)
+                || (has(self.initProvider) && has(self.initProvider.path))'
+          status:
+            description: GroupStatus defines the observed state of Group.
+            properties:
+              atProvider:
+                properties:
+                  allowedEmailDomainsList:
+                    description: |-
+                      (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                      A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+                    items:
+                      type: string
+                    type: array
+                  autoDevopsEnabled:
+                    description: |-
+                      (Boolean) Default to Auto DevOps pipeline for all projects within this group.
+                      Default to Auto DevOps pipeline for all projects within this group.
+                    type: boolean
+                  avatar:
+                    description: |-
+                      (String) A local path to the avatar image to upload. Note: not available for imported resources.
+                      A local path to the avatar image to upload. **Note**: not available for imported resources.
+                    type: string
+                  avatarHash:
+                    description: |-
+                      (String) The hash of the avatar image. Use filesha256("path/to/avatar.png") whenever possible. Note: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                      The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+                    type: string
+                  avatarUrl:
+                    description: |-
+                      (String) The URL of the avatar image.
+                      The URL of the avatar image.
+                    type: string
+                  defaultBranch:
+                    description: |-
+                      (String) Initial default branch name.
+                      Initial default branch name.
+                    type: string
+                  defaultBranchProtection:
+                    description: |-
+                      for-default_branch_protection. Valid values are: 0, 1, 2, 3, 4.
+                      See https://docs.gitlab.com/api/groups/#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
+                    type: number
+                  defaultBranchProtectionDefaults:
+                    description: |-
+                      (Block List, Max: 1) The default branch protection defaults (see below for nested schema)
+                      The default branch protection defaults
+                    items:
+                      properties:
+                        allowForcePush:
+                          description: |-
+                            (Boolean) Allow force push for all users with push access.
+                            Allow force push for all users with push access.
+                          type: boolean
+                        allowedToMerge:
+                          description: |-
+                            (List of String) An array of access levels allowed to merge. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to merge. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        allowedToPush:
+                          description: |-
+                            (List of String) An array of access levels allowed to push. Valid values are: developer, maintainer, no one.
+                            An array of access levels allowed to push. Valid values are: `developer`, `maintainer`, `no one`.
+                          items:
+                            type: string
+                          type: array
+                        developerCanInitialPush:
+                          description: |-
+                            (Boolean) Allow developers to initial push.
+                            Allow developers to initial push.
+                          type: boolean
+                      type: object
+                    type: array
+                  description:
+                    description: |-
+                      (String) The group's description.
+                      The group's description.
+                    type: string
+                  emailsEnabled:
+                    description: |-
+                      (Boolean) Enable email notifications.
+                      Enable email notifications.
+                    type: boolean
+                  extraSharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+                      Can be set by administrators only. Additional CI/CD minutes for this group.
+                    type: number
+                  fullName:
+                    description: |-
+                      (String) The full name of the group.
+                      The full name of the group.
+                    type: string
+                  fullPath:
+                    description: |-
+                      (String) The full path of the group.
+                      The full path of the group.
+                    type: string
+                  id:
+                    description: (String) The ID of this resource.
+                    type: string
+                  ipRestrictionRanges:
+                    description: |-
+                      (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                      A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+                    items:
+                      type: string
+                    type: array
+                  lfsEnabled:
+                    description: |-
+                      (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
+                      Enable/disable Large File Storage (LFS) for the projects in this group.
+                    type: boolean
+                  membershipLock:
+                    description: |-
+                      (Boolean) Users cannot be added to projects in this group.
+                      Users cannot be added to projects in this group.
+                    type: boolean
+                  mentionsDisabled:
+                    description: |-
+                      (Boolean) Disable the capability of a group from getting mentioned.
+                      Disable the capability of a group from getting mentioned.
+                    type: boolean
+                  name:
+                    description: |-
+                      (String) The name of the group.
+                      The name of the group.
+                    type: string
+                  parentId:
+                    description: |-
+                      (Number) Id of the parent group (creates a nested group).
+                      Id of the parent group (creates a nested group).
+                    type: number
+                  path:
+                    description: |-
+                      (String) The path of the group.
+                      The path of the group.
+                    type: string
+                  permanentlyRemoveOnDelete:
+                    description: |-
+                      (Boolean) Whether the group should be permanently removed during a delete operation. This only works with subgroups. Must be configured via an apply before the destroy is run.
+                      Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
+                    type: boolean
+                  preventForkingOutsideGroup:
+                    description: |-
+                      (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                      Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+                    type: boolean
+                  projectCreationLevel:
+                    description: |-
+                      (String) Determine if developers can create projects in the group. Valid values are: noone, owner, maintainer, developer
+                      Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`
+                    type: string
+                  pushRules:
+                    description: |-
+                      (Block List, Max: 1) Push rules for the group. (see below for nested schema)
+                      Push rules for the group.
+                    items:
+                      properties:
+                        authorEmailRegex:
+                          description: |-
+                            company.com$.
+                            All commit author emails must match this regex, e.g. `@my-company.com$`.
+                          type: string
+                        branchNameRegex:
+                          description: |-
+                            (String) All branch names must match this regex, e.g. (feature|hotfix)\/*.
+                            All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+                          type: string
+                        commitCommitterCheck:
+                          description: |-
+                            (Boolean) Only commits pushed using verified emails are allowed.
+                            Only commits pushed using verified emails are allowed.
+                          type: boolean
+                        commitCommitterNameCheck:
+                          description: |-
+                            (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                            Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+                          type: boolean
+                        commitMessageNegativeRegex:
+                          description: |-
+                            (String) No commit message is allowed to match this regex, for example ssh\:\/\/.
+                            No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+                          type: string
+                        commitMessageRegex:
+                          description: |-
+                            (String) All commit messages must match this regex, e.g. Fixed \d+\..*.
+                            All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+                          type: string
+                        denyDeleteTag:
+                          description: |-
+                            (Boolean) Deny deleting a tag.
+                            Deny deleting a tag.
+                          type: boolean
+                        fileNameRegex:
+                          description: |-
+                            (String) Filenames matching the regular expression provided in this attribute are not allowed, for example, (jar|exe)$.
+                            Filenames matching the regular expression provided in this attribute are not allowed, for example, `(jar|exe)$`.
+                          type: string
+                        maxFileSize:
+                          description: |-
+                            (Number) Maximum file size (MB) allowed.
+                            Maximum file size (MB) allowed.
+                          type: number
+                        memberCheck:
+                          description: |-
+                            (Boolean) Allows only GitLab users to author commits.
+                            Allows only GitLab users to author commits.
+                          type: boolean
+                        preventSecrets:
+                          description: |-
+                            (Boolean) GitLab will reject any files that are likely to contain secrets.
+                            GitLab will reject any files that are likely to contain secrets.
+                          type: boolean
+                        rejectNonDcoCommits:
+                          description: |-
+                            (Boolean) Reject commit when it’s not DCO certified.
+                            Reject commit when it’s not DCO certified.
+                          type: boolean
+                        rejectUnsignedCommits:
+                          description: |-
+                            (Boolean) Only commits signed through GPG are allowed.
+                            Only commits signed through GPG are allowed.
+                          type: boolean
+                      type: object
+                    type: array
+                  requestAccessEnabled:
+                    description: |-
+                      (Boolean) Allow users to request member access.
+                      Allow users to request member access.
+                    type: boolean
+                  requireTwoFactorAuthentication:
+                    description: |-
+                      factor authentication.
+                      Require all users in this group to setup Two-factor authentication.
+                    type: boolean
+                  shareWithGroupLock:
+                    description: |-
+                      (Boolean) Prevent sharing a project with another group within this group.
+                      Prevent sharing a project with another group within this group.
+                    type: boolean
+                  sharedRunnersMinutesLimit:
+                    description: |-
+                      (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                      Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+                    type: number
+                  sharedRunnersSetting:
+                    description: |-
+                      (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: enabled, disabled_and_overridable, disabled_and_unoverridable, disabled_with_override.
+                      Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+                    type: string
+                  subgroupCreationLevel:
+                    description: |-
+                      (String) Allowed to create subgroups. Valid values are: owner, maintainer.
+                      Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
+                    type: string
+                  twoFactorGracePeriod:
+                    description: |-
+                      factor authentication is enforced (in hours).
+                      Defaults to 48. Time before Two-factor authentication is enforced (in hours).
+                    type: number
+                  visibilityLevel:
+                    description: |-
+                      (String) The group's visibility. Can be private, internal, or public. Valid values are: private, internal, public.
+                      The group's visibility. Can be `private`, `internal`, or `public`. Valid values are: `private`, `internal`, `public`.
+                    type: string
+                  webUrl:
+                    description: |-
+                      (String) Web URL of the group.
+                      Web URL of the group.
+                    type: string
+                  wikiAccessLevel:
+                    description: |-
+                      (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.
+                      The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

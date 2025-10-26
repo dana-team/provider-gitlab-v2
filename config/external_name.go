@@ -7,17 +7,20 @@ import (
 // ExternalNameConfigs contains all external name configurations for this
 // provider.
 var ExternalNameConfigs = map[string]config.ExternalName{
-	// Import requires using a randomly generated ID from provider: nl-2e21sda
-	"null_resource": idWithStub(),
-}
-
-func idWithStub() config.ExternalName {
-	e := config.IdentifierFromProvider
-	e.GetExternalNameFn = func(tfstate map[string]any) (string, error) {
-		en, _ := config.IDAsExternalName(tfstate)
-		return en, nil
-	}
-	return e
+	"gitlab_group":              config.IdentifierFromProvider,
+	"gitlab_project":            config.IdentifierFromProvider,
+	"gitlab_repository_file":    config.IdentifierFromProvider,
+	"gitlab_project_membership": config.IdentifierFromProvider,
+	"gitlab_group_membership":   config.IdentifierFromProvider,
+	"gitlab_user": {
+		SetIdentifierArgumentFn: func(base map[string]any, name string) {
+			base["username"] = name
+		},
+		GetExternalNameFn: config.IDAsExternalName,
+		GetIDFn:           config.ExternalNameAsID,
+		OmittedFields:     []string{"username"},
+	},
+	"gitlab_project_share_group": config.IdentifierFromProvider,
 }
 
 // ExternalNameConfigurations applies all external name configs listed in the

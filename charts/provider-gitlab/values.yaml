@@ -1,0 +1,51 @@
+# Default values for provider-gitlab.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  # -- The repository of the provider container image.
+  repository: ghcr.io/dana-team/provider-gitlab-v2
+  # -- The tag of the manager container image.
+  tag: ""
+
+# Override the name of the deployment
+nameOverride: ""
+
+# Override the full name of the deployment
+fullnameOverride: ""
+
+provider:
+  # -- Name of the provider
+  name: provider-gitlab
+  runtimeConfigRef:
+    # -- Name of the DeploymentRuntimeConfig object to use
+    name: gitlab-config-v2
+
+# -- Configuration to be added to the provider deployment via the DeploymentRuntimeConfig resource
+deploymentRuntimeConfig:
+  name: gitlab-config-v2
+  container:
+    args:
+      - --debug
+    name: package-runtime
+
+# -- Provider authentication configuration
+providerConfig:
+  name: gitlab-provider-v2
+  credentials:
+    source: Secret
+    secretRef:
+      name: gitlab-creds
+      namespace: crossplane-system
+      key: credentials
+  baseURL: https://gitlab.com
+  insecure: false
+
+# -- Secret values for the provider authentication.
+secret:
+  # -- Name of the secret.
+  name: gitlab-creds
+  # -- Type of the secret.
+  type: Opaque
+  # -- The gitlab access token to authenticate with.
+  token: gitlab-token
