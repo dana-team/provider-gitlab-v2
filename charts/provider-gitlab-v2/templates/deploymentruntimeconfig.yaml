@@ -3,7 +3,7 @@ kind: DeploymentRuntimeConfig
 metadata:
   name: {{ .Values.deploymentRuntimeConfig.name }}
   labels:
-    {{- include "provider-gitlab.labels" . | nindent 4 }}
+    {{- include "provider-gitlab-v2.labels" . | nindent 4 }}
 spec:
   deploymentTemplate:
     spec:
