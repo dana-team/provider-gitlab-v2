@@ -3,7 +3,7 @@ kind: ProviderConfig
 metadata:
   name: {{ .Values.providerConfig.name }}
   labels:
-    {{- include "provider-gitlab.labels" . | nindent 4 }}
+    {{- include "provider-gitlab-v2.labels" . | nindent 4 }}
 spec:
   credentials:
     source: {{ .Values.providerConfig.credentials.source }}
