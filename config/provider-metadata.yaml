@@ -1067,8 +1067,8 @@ resources:
               manifest: |-
                 {
                   "group": "${gitlab_group.foo.id}",
-                  "image_url": "https://gitlab.example.com/%{project_path}/badges/%{default_branch}/pipeline.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/pipelines?ref=%{default_branch}"
+                  "image_url": "https://gitlab.example.com/%%{project_path}/badges/%%{default_branch}/pipeline.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/pipelines?ref=%%{default_branch}"
                 }
               references:
                 group: gitlab_group.foo.id
@@ -1081,8 +1081,8 @@ resources:
               manifest: |-
                 {
                   "group": "${gitlab_group.foo.id}",
-                  "image_url": "https://gitlab.example.com/%{project_path}/badges/%{default_branch}/coverage.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/jobs"
+                  "image_url": "https://gitlab.example.com/%%{project_path}/badges/%%{default_branch}/coverage.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/jobs"
                 }
               references:
                 group: gitlab_group.foo.id
@@ -1095,8 +1095,8 @@ resources:
               manifest: |-
                 {
                   "group": "${gitlab_group.foo.id}",
-                  "image_url": "https://gitlab.example.com/%{project_path}/-/badges/release.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/releases"
+                  "image_url": "https://gitlab.example.com/%%{project_path}/-/badges/release.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/releases"
                 }
               references:
                 group: gitlab_group.foo.id
@@ -3178,8 +3178,8 @@ resources:
             - name: gitlab_pipeline
               manifest: |-
                 {
-                  "image_url": "https://gitlab.example.com/%{project_path}/badges/%{default_branch}/pipeline.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/pipelines?ref=%{default_branch}",
+                  "image_url": "https://gitlab.example.com/%%{project_path}/badges/%%{default_branch}/pipeline.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/pipelines?ref=%%{default_branch}",
                   "name": "badge-pipeline",
                   "project": "${gitlab_project.foo.id}"
                 }
@@ -3193,8 +3193,8 @@ resources:
             - name: gitlab_coverage
               manifest: |-
                 {
-                  "image_url": "https://gitlab.example.com/%{project_path}/badges/%{default_branch}/coverage.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/jobs",
+                  "image_url": "https://gitlab.example.com/%%{project_path}/badges/%%{default_branch}/coverage.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/jobs",
                   "name": "badge-coverage",
                   "project": "${gitlab_project.foo.id}"
                 }
@@ -3208,8 +3208,8 @@ resources:
             - name: gitlab_release
               manifest: |-
                 {
-                  "image_url": "https://gitlab.example.com/%{project_path}/-/badges/release.svg",
-                  "link_url": "https://gitlab.example.com/%{project_path}/-/releases",
+                  "image_url": "https://gitlab.example.com/%%{project_path}/-/badges/release.svg",
+                  "link_url": "https://gitlab.example.com/%%{project_path}/-/releases",
                   "name": "badge-release",
                   "project": "${gitlab_project.foo.id}"
                 }
