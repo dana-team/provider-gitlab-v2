@@ -8,14 +8,14 @@ A Helm chart for Crossplane provider-gitlab
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| deploymentRuntimeConfig | object | `{"container":{"args":["--debug"],"name":"package-runtime"},"name":"gitlab-config"}` | Configuration to be added to the provider deployment via the DeploymentRuntimeConfig resource |
+| deploymentRuntimeConfig | object | `{"container":{"args":["--debug"],"name":"package-runtime"},"name":"gitlab-config-v2"}` | Configuration to be added to the provider deployment via the DeploymentRuntimeConfig resource |
 | fullnameOverride | string | `""` |  |
-| image.repository | string | `"ghcr.io/dana-team/provider-gitlab"` | The repository of the provider container image. |
+| image.repository | string | `"ghcr.io/dana-team/provider-gitlab-v2"` | The repository of the provider container image. |
 | image.tag | string | `""` | The tag of the manager container image. |
 | nameOverride | string | `""` |  |
 | provider.name | string | `"provider-gitlab"` | Name of the provider |
-| provider.runtimeConfigRef.name | string | `"gitlab-config"` | Name of the DeploymentRuntimeConfig object to use |
-| providerConfig | object | `{"credentials":{"secretRef":{"key":"credentials","name":"gitlab-creds","namespace":"crossplane-system"},"source":"Secret"},"name":"gitlab-default"}` | Provider authentication configuration |
+| provider.runtimeConfigRef.name | string | `"gitlab-config-v2"` | Name of the DeploymentRuntimeConfig object to use |
+| providerConfig | object | `{"baseURL":"https://gitlab.com","credentials":{"secretRef":{"key":"credentials","name":"gitlab-creds","namespace":"crossplane-system"},"source":"Secret"},"insecure":false,"name":"gitlab-provider-v2"}` | Provider authentication configuration |
 | secret | object | `{"name":"gitlab-creds","token":"gitlab-token","type":"Opaque"}` | Secret values for the provider authentication. |
 | secret.name | string | `"gitlab-creds"` | Name of the secret. |
 | secret.token | string | `"gitlab-token"` | The gitlab access token to authenticate with. |
