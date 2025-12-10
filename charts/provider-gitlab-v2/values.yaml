@@ -16,7 +16,7 @@ fullnameOverride: ""
 
 provider:
   # -- Name of the provider
-  name: provider-gitlab
+  name: provider-gitlab-v2
   runtimeConfigRef:
     # -- Name of the DeploymentRuntimeConfig object to use
     name: gitlab-config-v2
